@@ -1,16 +1,34 @@
-require_relative 'square'
 class Chessboard
-  attr_accessor :board
+  attr_accessor :queue
   def initialize
-    puts "hey!"
+    @queue = []
   end
 
 
-  def knight_moves(location, target)
-
-    # Take target as a direction rule for x and y
-    # for this position
-    
+  def knight_moves(start_location, target)
+    return start_location if start_location == target
+    result, visited = [], []
+    @queue << [start_location]
+    path_found = false
+    until path_found
+      sequence = []
+      sequence = @queue.shift
+      current_knights_location = sequence.last 
+      visited << current_knights_location
+      next_locations = get_allowed_squares(current_knights_location)
+      if next_locations.include?(target)
+        result = sequence
+        result << target 
+        path_found = true
+      else
+        next_locations.each do |location|
+          next_check = sequence.dup 
+          next_check << location if !visited.include?(location)
+          @queue << next_check
+        end
+      end
+    end
+    result
   end
 
   def get_allowed_squares(location)
@@ -20,51 +38,11 @@ class Chessboard
       [1, -1].each do |j|
         a, b = x + i, y + j
         array_of_squares << [a, b] if a >= 0 && b >= 0 && a <= 7 && b <= 7
-        a, b = y + i, x + j
+        b, a = y + i, x + j
         array_of_squares << [a, b] if a >= 0 && b >= 0 && a <= 7 && b <= 7
       end
     end
     array_of_squares
-    
   end
-
 end
 
-# x - 2; y - 1
-# x - 2; y + 1
-# x + 2; y + 1
-# x + 2; y - 1
-# x - 1; y - 2
-# x - 1; y + 2
-# x + 1; y + 2
-# x + 1; y - 2
-
-
-
-
-
-
-
-# Example of the BFS from previous task
-  # def level_order
-  #   return to_enum(:level_order) unless block_given?
-
-  #   result = []
-  #   @queue << @root
-  #   until @queue.empty?
-  #     result << queue_handler
-  #   end
-
-  #   result.each do |val|
-  #     yield(val)
-  #   end
-  #   self
-  # end
-
-  # def queue_handler
-  #   node = @queue.shift
-  #   result = node.value
-  #   @queue.push(node.left) if node.left
-  #   @queue.push(node.right) if node.right
-  #   result
-  # end
